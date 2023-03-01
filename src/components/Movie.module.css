@@ -18,4 +18,9 @@
     margin: 0;
     font-size: 1rem;
   }
+
+  .button{
+    background-color: white;
+    color: black;
+  }
   

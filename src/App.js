@@ -9,27 +9,43 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  const deleteMovieHandler= async ()=>{
+   fetch("https://react-dummy-b2e78-default-rtdb.firebaseio.com//movies/-NPRKc1viOGPoVMM5FGq",{
+       method:"DELETE"
+    })
+      
+   
+    // console.log('hi')
+    //  const ele=document.getElementById('delete')
+    //  ele.remove()
+ 
+  }
+
   const fetchMoviesHandler = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
 
-      const response = await fetch("https://swapi.dev/api/films");
-
+      const response = await fetch("https://react-dummy-b2e78-default-rtdb.firebaseio.com/movies.json/");
+      
       if (!response.ok) {
         throw new Error("Something went wrong");
       }
       const data = await response.json();
+     
+      let loadedData=[]
 
-      const tranformedData = data.results.map((movieData) => {
-        return {
-          id: movieData.episode_id,
-          title: movieData.title,
-          openingText: movieData.opening_crawl,
-          releaseDate: movieData.release_date,
-        };
-      });
-      setMovies(tranformedData);
+      for(const key in data){
+        loadedData.push({
+          id:key,
+          title:data[key].title,
+          openingText:data[key].openingText,
+          releaseDate:data[key].releaseDate
+        })
+      }
+
+      
+      setMovies(loadedData);
     } catch (error) {
       setError(error.message);
     }
@@ -42,7 +58,7 @@ function App() {
 
   let content = <p>No movies found</p>;
   if (movies.length > 0) {
-    content = <MoviesList movies={movies} />;
+    content = <MoviesList movies={movies} onDelete={deleteMovieHandler}/>;
   }
   let id;
   if (error) {
@@ -63,15 +79,43 @@ function App() {
     setError(null);
     clearTimeout(id);
   };
+  const addMovieHandler=async (movie)=>{
+    const response=await fetch("https://react-dummy-b2e78-default-rtdb.firebaseio.com/movies.json",{
+      method:'POST',
+      body:JSON.stringify(movie),
+      headers:{
+        'Content-Type':'application/json'
+      }
+    })
+
+    const data= await response.json();
+    console.log(data)
+  }
+
+ 
+
+  // const deleteMovieHandler= ()=>{
+  //   const deletekey= fetch("https://console.firebase.google.com/project/react-dummy-b2e78/database/react-dummy-b2e78-default-rtdb/data/~2Fmovies~2F-NPRN_GzoRX3o0_TlHZJ",{
+  //     method:'DELETE',
+    
+  //   })
+   
+  //   console.log('hi')
+  //    const ele=document.getElementById('delete')
+  //    ele.remove()
+ 
+  // }
+ 
+  
 
   return (
     <React.Fragment>
-      <MovieForm />
+      <MovieForm onAddMovie={addMovieHandler}  />
       <section>
         <button onClick={fetchMoviesHandler}>Fetch Movies</button>
       </section>
       <section>
-        {content}
+        {content} 
         {error && <button onClick={stopHandler}>cancel</button>}
       </section>
     </React.Fragment>
