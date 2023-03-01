@@ -8,7 +8,6 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
-
   const fetchMoviesHandler = useCallback(async () => {
     try {
       setIsLoading(true);
@@ -36,11 +35,15 @@ function App() {
     setIsLoading(false);
   }, []);
 
+  useEffect(() => {
+    fetchMoviesHandler();
+  }, [fetchMoviesHandler]);
+
   let content = <p>No movies found</p>;
   if (movies.length > 0) {
     content = <MoviesList movies={movies} />;
   }
-  let id
+  let id;
   if (error) {
     content = (
       <p>
@@ -48,17 +51,17 @@ function App() {
       </p>
     );
 
-     id = setTimeout(fetchMoviesHandler, 5000);
+    id = setTimeout(fetchMoviesHandler, 5000);
   }
 
   if (isLoading) {
     content = <p>Loading..</p>;
   }
 
-  const stopHandler=()=>{
-    setError(null)
-    clearTimeout(id)
-  }
+  const stopHandler = () => {
+    setError(null);
+    clearTimeout(id);
+  };
 
   return (
     <React.Fragment>
@@ -67,7 +70,7 @@ function App() {
       </section>
       <section>
         {content}
-        {error &&<button onClick={stopHandler}>cancel</button>}
+        {error && <button onClick={stopHandler}>cancel</button>}
       </section>
     </React.Fragment>
   );
